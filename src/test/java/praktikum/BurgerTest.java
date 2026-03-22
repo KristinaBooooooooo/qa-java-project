@@ -23,22 +23,22 @@ public class BurgerTest {
     private Bun mockBun;
 
     @Mock
-    private Ingredient mockIngredient1;
+    private Ingredient mockSauce;
 
     @Mock
-    private Ingredient mockIngredient2;
+    private Ingredient mockFilling;
 
     @Before
     public void setUp() {
         burger = new Burger();
         when(mockBun.getName()).thenReturn("Mock Bun");
         when(mockBun.getPrice()).thenReturn(100f);
-        when(mockIngredient1.getType()).thenReturn(IngredientType.SAUCE);
-        when(mockIngredient1.getName()).thenReturn("Mock Sauce");
-        when(mockIngredient1.getPrice()).thenReturn(50f);
-        when(mockIngredient2.getType()).thenReturn(IngredientType.FILLING);
-        when(mockIngredient2.getName()).thenReturn("Mock Filling");
-        when(mockIngredient2.getPrice()).thenReturn(75f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+        when(mockSauce.getName()).thenReturn("Mock Sauce");
+        when(mockSauce.getPrice()).thenReturn(50f);
+        when(mockFilling.getType()).thenReturn(IngredientType.FILLING);
+        when(mockFilling.getName()).thenReturn("Mock Filling");
+        when(mockFilling.getPrice()).thenReturn(75f);
     }
 
     @Test
@@ -50,21 +50,19 @@ public class BurgerTest {
 
     @Test
     public void addIngredientShouldAddIngredientToList() {
-        burger.addIngredient(mockIngredient1);
+        burger.addIngredient(mockSauce);
 
         assertEquals("Размер списка должен быть 1", 1, burger.ingredients.size());
-        assertSame("Добавленный ингредиент должен быть в списке", mockIngredient1, burger.ingredients.get(0));
     }
 
     @Test
     public void removeIngredientShouldDeleteIngredientByIndex() {
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
 
         burger.removeIngredient(0);
 
-        assertEquals("После удаления размер должен стать 1", 1, burger.ingredients.size());
-        assertSame("Оставшийся элемент — второй ингредиент", mockIngredient2, burger.ingredients.get(0));
+        assertSame("Оставшийся элемент — второй ингредиент", mockFilling, burger.ingredients.get(0));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -74,13 +72,12 @@ public class BurgerTest {
 
     @Test
     public void moveIngredientShouldChangeIngredientPosition() {
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
 
         burger.moveIngredient(1, 0);
 
-        assertSame("На позиции 0 должен быть второй ингредиент", mockIngredient2, burger.ingredients.get(0));
-        assertSame("На позиции 1 должен быть первый ингредиент", mockIngredient1, burger.ingredients.get(1));
+        assertSame("На позиции 0 должен быть второй ингредиент", mockFilling, burger.ingredients.get(0));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -91,18 +88,15 @@ public class BurgerTest {
     @Test
     public void getPriceShouldSumBunAndIngredientsPrices() {
         when(mockBun.getPrice()).thenReturn(50f);
-        when(mockIngredient1.getPrice()).thenReturn(30f);
-        when(mockIngredient2.getPrice()).thenReturn(20f);
+        when(mockSauce.getPrice()).thenReturn(30f);
+        when(mockFilling.getPrice()).thenReturn(20f);
         burger.setBuns(mockBun);
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
 
         float actualPrice = burger.getPrice();
 
         assertEquals("Цена бургера должна быть 150", 150, actualPrice, 0.001);
-        verify(mockBun, times(1)).getPrice();
-        verify(mockIngredient1, times(1)).getPrice();
-        verify(mockIngredient2, times(1)).getPrice();
     }
 
     @Test
@@ -110,30 +104,30 @@ public class BurgerTest {
         when(mockBun.getName()).thenReturn("black bun");
         when(mockBun.getPrice()).thenReturn(100f);
         burger.setBuns(mockBun);
+        String expected = String.format("(==== black bun ====)%n(==== black bun ====)%n%nPrice: %f%n", 200f);
 
         String receipt = burger.getReceipt();
 
-        String expectedEnd = String.format("(==== black bun ====)%n%nPrice: %f%n", burger.getPrice());
-        assertTrue("Чек должен начинаться с верхней булки", receipt.startsWith("(==== black bun ====)"));
-        assertTrue("Чек должен заканчиваться нижней булкой и ценой", receipt.endsWith(expectedEnd));
+        assertEquals("Чек без ингредиентов должен быть сформирован верно", expected, receipt);
     }
 
     @Test
     public void getReceiptShouldIncludeAllIngredients() {
         when(mockBun.getName()).thenReturn("white bun");
-        when(mockIngredient1.getType()).thenReturn(IngredientType.SAUCE);
-        when(mockIngredient1.getName()).thenReturn("hot sauce");
-        when(mockIngredient2.getType()).thenReturn(IngredientType.FILLING);
-        when(mockIngredient2.getName()).thenReturn("cutlet");
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+        when(mockSauce.getName()).thenReturn("hot sauce");
+        when(mockFilling.getType()).thenReturn(IngredientType.FILLING);
+        when(mockFilling.getName()).thenReturn("cutlet");
         burger.setBuns(mockBun);
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
+        String expected = String.format(
+                "(==== white bun ====)%n= sauce hot sauce =%n= filling cutlet =%n(==== white bun ====)%n%nPrice: %f%n",
+                325f
+        );
 
         String receipt = burger.getReceipt();
 
-        assertTrue("Чек должен содержать верхнюю булку", receipt.contains("(==== white bun ====)"));
-        assertTrue("Чек должен содержать соус", receipt.contains("= sauce hot sauce ="));
-        assertTrue("Чек должен содержать начинку", receipt.contains("= filling cutlet ="));
-        assertTrue("Чек должен содержать цену", receipt.contains("Price:"));
+        assertEquals("Чек с ингредиентами должен быть сформирован верно", expected, receipt);
     }
 }

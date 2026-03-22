@@ -19,19 +19,19 @@ import static org.junit.Assert.assertEquals;
 public class BurgerPriceParameterizedTest {
 
     private final float bunPrice;
-    private final float ingredient1Price;
-    private final float ingredient2Price;
+    private final float saucePrice;
+    private final float fillingPrice;
     private final float expectedPrice;
 
-    public BurgerPriceParameterizedTest(float bunPrice, float ingredient1Price,
-                                        float ingredient2Price, float expectedPrice) {
+    public BurgerPriceParameterizedTest(float bunPrice, float saucePrice,
+                                        float fillingPrice, float expectedPrice) {
         this.bunPrice = bunPrice;
-        this.ingredient1Price = ingredient1Price;
-        this.ingredient2Price = ingredient2Price;
+        this.saucePrice = saucePrice;
+        this.fillingPrice = fillingPrice;
         this.expectedPrice = expectedPrice;
     }
 
-    @Parameters(name = "Цена булки = {0}, ингр1 = {1}, ингр2 = {2} -> ожидаем {3}")
+    @Parameters(name = "Цена булки = {0}, цена соуса = {1}, цена начинки = {2} -> ожидаем {3}")
     public static Collection<Object[]> getTestData() {
         return Arrays.asList(new Object[][]{
                 {100, 0, 0, 200},
@@ -46,8 +46,8 @@ public class BurgerPriceParameterizedTest {
     public void getPriceShouldReturnCorrectSum() {
         Burger burger = new Burger();
         Bun bun = new Bun("test bun", bunPrice);
-        Ingredient ingredient1 = new Ingredient(IngredientType.SAUCE, "sauce", ingredient1Price);
-        Ingredient ingredient2 = new Ingredient(IngredientType.FILLING, "filling", ingredient2Price);
+        Ingredient ingredient1 = new Ingredient(IngredientType.SAUCE, "sauce", saucePrice);
+        Ingredient ingredient2 = new Ingredient(IngredientType.FILLING, "filling", fillingPrice);
         burger.setBuns(bun);
         burger.addIngredient(ingredient1);
         burger.addIngredient(ingredient2);
